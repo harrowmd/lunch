@@ -58,17 +58,30 @@
       color: #666;
     }
 
+    /* ── Swipe hint ── */
+    #swipe-hint {
+      display: none;
+      font-size: 0.8rem;
+      color: #aaa;
+      text-align: center;
+      margin-top: 0.4rem;
+      letter-spacing: 0.02em;
+      user-select: none;
+    }
+
     /* ── Meal card ── */
     #meal-card {
       display: none;
       flex-direction: column;
       align-items: center;
       width: min(92vw, 480px);
-      margin: 1.5rem auto 2rem;
+      margin: 1.5rem auto 0.5rem;
       background: white;
       border-radius: 1rem;
       box-shadow: 0 4px 20px rgba(0,0,0,0.12);
       overflow: hidden;
+      transition: transform 0.25s ease, opacity 0.25s ease;
+      touch-action: pan-y;
     }
     #meal-img {
       width: 100%;
@@ -149,6 +162,7 @@
         <a id="meal-link" href="#" target="_blank" rel="noopener"></a>
       </div>
     </div>
+    <div id="swipe-hint">← swipe left for next suggestion</div>
   </div>
 
   <script>
@@ -160,6 +174,7 @@
     const mealImg        = document.getElementById('meal-img');
     const mealName       = document.getElementById('meal-name');
     const mealLink       = document.getElementById('meal-link');
+    const swipeHint      = document.getElementById('swipe-hint');
 
     // Day-of-week label
     const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
@@ -231,8 +246,61 @@
       mealLink.href        = recipeUrl;
       mealLink.textContent = recipeUrl;
       mealCard.style.display = 'flex';
+      swipeHint.style.display = 'block';
       statusEl.style.display = 'none';
     }
+
+    // ── Swipe-left to fetch next meal ────────────────────────
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let isSwiping   = false;
+
+    mealCard.addEventListener('touchstart', e => {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      isSwiping   = false;
+    }, { passive: true });
+
+    mealCard.addEventListener('touchmove', e => {
+      const dx = e.touches[0].clientX - touchStartX;
+      const dy = e.touches[0].clientY - touchStartY;
+      // Only track as a horizontal swipe if it's more horizontal than vertical
+      if (!isSwiping && Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10) {
+        isSwiping = true;
+      }
+      if (isSwiping && dx < 0) {
+        // Follow finger while swiping left
+        mealCard.style.transform = `translateX(${dx}px)`;
+        mealCard.style.opacity   = String(Math.max(0, 1 + dx / 300));
+      }
+    }, { passive: true });
+
+    mealCard.addEventListener('touchend', async e => {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      if (isSwiping && dx < -80) {
+        // Commit the swipe: slide card off-screen then load next meal
+        mealCard.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
+        mealCard.style.transform  = 'translateX(-110vw)';
+        mealCard.style.opacity    = '0';
+        setTimeout(async () => {
+          mealCard.style.transition = '';
+          mealCard.style.transform  = '';
+          mealCard.style.opacity    = '';
+          mealCard.style.display    = 'none';
+          swipeHint.style.display   = 'none';
+          statusEl.style.display    = 'block';
+          try { await fetchMeal(); }
+          catch (err) { statusEl.textContent = 'Could not load meal: ' + err.message; }
+        }, 220);
+      } else {
+        // Snap back
+        mealCard.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
+        mealCard.style.transform  = '';
+        mealCard.style.opacity    = '';
+        setTimeout(() => { mealCard.style.transition = ''; }, 200);
+      }
+      isSwiping = false;
+    }, { passive: true });
 
     // ── Init ─────────────────────────────────────────────────
     async function init() {
