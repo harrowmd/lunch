@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ffffff">
+  <title>Lunch</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      font-family: sans-serif;
+      background: #f0f4f8;
+      transition: background 0.5s;
+    }
+
+    /* ── Top bar ── */
+    #topbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1.25rem;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(6px);
+      z-index: 10;
+    }
+    #day-label {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #333;
+    }
+    #weather-emoji {
+      font-size: 2rem;
+      line-height: 1;
+    }
+    #weather-tip {
+      font-size: 0.75rem;
+      color: #888;
+      text-align: right;
+    }
+
+    /* ── Main content ── */
+    #main {
+      padding-top: 5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    #status-msg {
+      margin-top: 3rem;
+      font-size: 1rem;
+      color: #666;
+    }
+
+    /* ── Meal card ── */
+    #meal-card {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      width: min(92vw, 480px);
+      margin: 1.5rem auto 2rem;
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+      overflow: hidden;
+    }
+    #meal-img {
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+    }
+    #meal-body {
+      padding: 1rem 1.25rem 1.25rem;
+      width: 100%;
+    }
+    #meal-name {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #222;
+      margin-bottom: 0.6rem;
+    }
+    #meal-link {
+      display: inline-block;
+      font-size: 0.85rem;
+      color: #1a73e8;
+      word-break: break-all;
+      text-decoration: none;
+    }
+    #meal-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <div id="topbar">
+    <span id="day-label">Lunch</span>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;">
+      <span id="weather-emoji">🌍</span>
+      <span id="weather-tip"></span>
+    </div>
+  </div>
+
+  <div id="main">
+    <div id="status-msg">Detecting location…</div>
+
+    <div id="meal-card">
+      <img id="meal-img" src="" alt="Meal photo">
+      <div id="meal-body">
+        <div id="meal-name"></div>
+        <a id="meal-link" href="#" target="_blank" rel="noopener"></a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const weatherEmojiEl = document.getElementById('weather-emoji');
+    const weatherTipEl   = document.getElementById('weather-tip');
+    const dayLabelEl     = document.getElementById('day-label');
+    const statusEl       = document.getElementById('status-msg');
+    const mealCard       = document.getElementById('meal-card');
+    const mealImg        = document.getElementById('meal-img');
+    const mealName       = document.getElementById('meal-name');
+    const mealLink       = document.getElementById('meal-link');
+
+    // Day-of-week label
+    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    dayLabelEl.textContent = `Lunch for ${days[new Date().getDay()]}`;
+
+    // ── Weather ──────────────────────────────────────────────
+    function weatherEmoji(code, tempC) {
+      if (tempC >= 30) return { emoji: '🥵', label: `${tempC}°C — Hot` };
+      if (tempC <= 0)  return { emoji: '🥶', label: `${tempC}°C — Freezing` };
+      if (code === 0)  return { emoji: '☀️',  label: `${tempC}°C — Clear` };
+      if (code <= 2)   return { emoji: '🌤️',  label: `${tempC}°C — Partly cloudy` };
+      if (code === 3)  return { emoji: '☁️',  label: `${tempC}°C — Overcast` };
+      if (code <= 48)  return { emoji: '🌫️',  label: `${tempC}°C — Foggy` };
+      if (code <= 57)  return { emoji: '🌦️',  label: `${tempC}°C — Drizzle` };
+      if (code <= 67)  return { emoji: '🌧️',  label: `${tempC}°C — Rain` };
+      if (code <= 77)  return { emoji: '❄️',  label: `${tempC}°C — Snow` };
+      if (code <= 82)  return { emoji: '🌧️',  label: `${tempC}°C — Showers` };
+      if (code <= 86)  return { emoji: '🌨️',  label: `${tempC}°C — Snow showers` };
+      if (code <= 99)  return { emoji: '⛈️',  label: `${tempC}°C — Thunderstorm` };
+      return { emoji: '🌡️', label: `${tempC}°C` };
+    }
+
+    function setBackground(emoji) {
+      const map = {
+        '☀️': '#fff9c4', '🌤️': '#e3f2fd', '☁️': '#eceff1',
+        '🌫️': '#cfd8dc', '🌦️': '#b3e5fc', '🌧️': '#90caf9',
+        '❄️': '#e0f7fa', '🌨️': '#e0f7fa', '⛈️': '#b0bec5',
+        '🥵': '#ffe082', '🥶': '#b3e5fc',
+      };
+      document.body.style.background = map[emoji] || '#f0f4f8';
+    }
+
+    async function fetchWeather(lat, lon) {
+      statusEl.textContent = 'Fetching weather…';
+      const res = await fetch(
+        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&timezone=auto`
+      );
+      if (!res.ok) throw new Error('Weather API error');
+      const data = await res.json();
+      const { emoji, label } = weatherEmoji(data.current.weather_code, data.current.temperature_2m);
+      weatherEmojiEl.textContent = emoji;
+      weatherTipEl.textContent   = label;
+      setBackground(emoji);
+    }
+
+    // ── Meal (TheMealDB) ─────────────────────────────────────
+    // Keto-friendly categories to pick from
+    const KETO_CATEGORIES = ['Chicken','Beef','Seafood','Lamb','Pork'];
+
+    async function fetchMeal() {
+      statusEl.textContent = 'Finding lunch…';
+      const cat = KETO_CATEGORIES[Math.floor(Math.random() * KETO_CATEGORIES.length)];
+      const listRes = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?c=${cat}`);
+      if (!listRes.ok) throw new Error('Meal list error');
+      const listData = await listRes.json();
+      const meals = listData.meals;
+      const pick  = meals[Math.floor(Math.random() * meals.length)];
+
+      // Fetch full details for the source URL
+      const detailRes = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${pick.idMeal}`);
+      if (!detailRes.ok) throw new Error('Meal detail error');
+      const detail = (await detailRes.json()).meals[0];
+
+      const recipeUrl = detail.strSource || detail.strYoutube || `https://www.themealdb.com/meal/${detail.idMeal}`;
+
+      mealImg.src          = detail.strMealThumb;
+      mealImg.alt          = detail.strMeal;
+      mealName.textContent = detail.strMeal;
+      mealLink.href        = recipeUrl;
+      mealLink.textContent = recipeUrl;
+      mealCard.style.display = 'flex';
+      statusEl.style.display = 'none';
+    }
+
+    // ── Init ─────────────────────────────────────────────────
+    async function init() {
+      if (!('geolocation' in navigator)) {
+        weatherEmojiEl.textContent = '🌍';
+        weatherTipEl.textContent   = 'No geolocation';
+        await fetchMeal();
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          try {
+            await fetchWeather(pos.coords.latitude, pos.coords.longitude);
+          } catch (e) {
+            weatherEmojiEl.textContent = '⚠️';
+            weatherTipEl.textContent   = 'Weather unavailable';
+          }
+          try {
+            await fetchMeal();
+          } catch (e) {
+            statusEl.textContent = 'Could not load meal: ' + e.message;
+          }
+        },
+        async () => {
+          weatherEmojiEl.textContent = '📍';
+          weatherTipEl.textContent   = 'Location denied';
+          try { await fetchMeal(); }
+          catch (e) { statusEl.textContent = 'Could not load meal: ' + e.message; }
+        }
+      );
+    }
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js');
+    }
+
+    init();
+  </script>
+</body>
+</html>
