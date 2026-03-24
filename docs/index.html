@@ -106,6 +106,13 @@
       text-decoration: none;
     }
     #meal-link:hover { text-decoration: underline; }
+    #yummy {
+      display: none;
+      margin-top: 0.8rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #e53935;
+    }
 
     /* ── Android download bar ── */
     #apk-bar {
@@ -160,6 +167,7 @@
       <div id="meal-body">
         <div id="meal-name"></div>
         <a id="meal-link" href="#" target="_blank" rel="noopener"></a>
+        <div id="yummy"></div>
       </div>
     </div>
     <div id="swipe-hint">← swipe left for next suggestion</div>
@@ -175,6 +183,12 @@
     const mealName       = document.getElementById('meal-name');
     const mealLink       = document.getElementById('meal-link');
     const swipeHint      = document.getElementById('swipe-hint');
+    const yummyEl        = document.getElementById('yummy');
+
+    const SMILEYS = ['😀','😄','😋','🤤','😍','🥰','😊','😁','🤩','😎','🥳','😇'];
+    function randomSmiley() {
+      return SMILEYS[Math.floor(Math.random() * SMILEYS.length)];
+    }
 
     // Day-of-week label
     const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
@@ -245,9 +259,11 @@
       mealName.textContent = detail.strMeal;
       mealLink.href        = recipeUrl;
       mealLink.textContent = recipeUrl;
-      mealCard.style.display = 'flex';
+      yummyEl.style.display   = 'none';
+      yummyEl.textContent     = '';
+      mealCard.style.display  = 'flex';
       swipeHint.style.display = 'block';
-      statusEl.style.display = 'none';
+      statusEl.style.display  = 'none';
     }
 
     // ── Swipe-left to fetch next meal ────────────────────────
@@ -268,17 +284,20 @@
       if (!isSwiping && Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10) {
         isSwiping = true;
       }
-      if (isSwiping && dx < 0) {
-        // Follow finger while swiping left
+      if (isSwiping) {
+        // Follow finger horizontally, fade on left swipe only
         mealCard.style.transform = `translateX(${dx}px)`;
-        mealCard.style.opacity   = String(Math.max(0, 1 + dx / 300));
+        if (dx < 0) {
+          mealCard.style.opacity = String(Math.max(0, 1 + dx / 300));
+        }
       }
     }, { passive: true });
 
     mealCard.addEventListener('touchend', async e => {
       const dx = e.changedTouches[0].clientX - touchStartX;
+
       if (isSwiping && dx < -80) {
-        // Commit the swipe: slide card off-screen then load next meal
+        // ── Swipe LEFT → next meal ──────────────────────────
         mealCard.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
         mealCard.style.transform  = 'translateX(-110vw)';
         mealCard.style.opacity    = '0';
@@ -292,8 +311,18 @@
           try { await fetchMeal(); }
           catch (err) { statusEl.textContent = 'Could not load meal: ' + err.message; }
         }, 220);
+
+      } else if (isSwiping && dx > 80) {
+        // ── Swipe RIGHT → show Yummy ────────────────────────
+        mealCard.style.transition = 'transform 0.2s ease';
+        mealCard.style.transform  = '';
+        yummyEl.textContent       = `Yummy... ${randomSmiley()}`;
+        yummyEl.style.display     = 'block';
+        swipeHint.style.display   = 'none';
+        setTimeout(() => { mealCard.style.transition = ''; }, 200);
+
       } else {
-        // Snap back
+        // ── Snap back ───────────────────────────────────────
         mealCard.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
         mealCard.style.transform  = '';
         mealCard.style.opacity    = '';
