@@ -1,0 +1,41 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.harrowmd.lunch'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.harrowmd.lunch"
+        minSdk 21
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+    }
+
+    signingConfigs {
+        release {
+            storeFile     file(project.findProperty('KEYSTORE_PATH') ?: "${rootDir}/../keystore.jks")
+            storePassword project.findProperty('KEYSTORE_PASSWORD') ?: 'lunchapp'
+            keyAlias      project.findProperty('KEY_ALIAS')         ?: 'lunch'
+            keyPassword   project.findProperty('KEY_PASSWORD')      ?: 'lunchapp'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+}

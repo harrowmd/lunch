@@ -1,0 +1,77 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'android/**'
+      - 'docs/**'
+      - '.github/workflows/build-apk.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platforms;android-34 build-tools;34.0.0'
+
+      - name: Generate signing keystore
+        run: |
+          keytool -genkey -v \
+            -keystore ${{ github.workspace }}/keystore.jks \
+            -alias lunch \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=Lunch App, OU=None, O=HarrowMD, L=London, ST=England, C=GB" \
+            -storepass lunchapp123 \
+            -keypass lunchapp123
+
+      - name: Generate Gradle wrapper
+        run: |
+          cd android
+          gradle wrapper --gradle-version 8.2
+          chmod +x gradlew
+
+      - name: Build release APK
+        run: |
+          cd android
+          ./gradlew assembleRelease \
+            -PKEYSTORE_PATH=${{ github.workspace }}/keystore.jks \
+            -PKEYSTORE_PASSWORD=lunchapp123 \
+            -PKEY_ALIAS=lunch \
+            -PKEY_PASSWORD=lunchapp123
+
+      - name: Rename APK
+        run: cp android/app/build/outputs/apk/release/app-release.apk lunch.apk
+
+      - name: Create or update GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-latest
+          name: "Lunch App — Latest APK"
+          body: |
+            Android APK built automatically from the latest source.
+
+            **Install instructions:**
+            1. On your Android device, go to Settings → Security → enable *Install unknown apps*
+            2. Download `lunch.apk` below
+            3. Open the downloaded file and tap Install
+          make_latest: true
+          files: lunch.apk
