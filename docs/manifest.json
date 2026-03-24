@@ -2,7 +2,7 @@
   "name": "Weather",
   "short_name": "Weather",
   "start_url": ".",
-  "display": "standalone",
+  "display": "fullscreen",
   "background_color": "#f0f4f8",
   "theme_color": "#ffffff",
   "description": "Shows your local weather as an emoji",
