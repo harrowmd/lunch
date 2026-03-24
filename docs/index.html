@@ -363,9 +363,10 @@
     window.addEventListener('load', () => requestFullscreen());
 
     // ── Android APK download bar ──────────────────────────────
-    if (/android/i.test(navigator.userAgent)) {
+    // Show only on Android browsers — not when already running inside the APK
+    const ua = navigator.userAgent;
+    if (/android/i.test(ua) && !/LunchAPK\//.test(ua)) {
       document.getElementById('apk-bar').style.display = 'block';
-      // Add bottom padding so the meal card isn't hidden behind the bar
       document.getElementById('main').style.paddingBottom = '5rem';
     }
 

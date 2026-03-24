@@ -28,6 +28,8 @@ public class MainActivity extends AppCompatActivity {
 
         webView = findViewById(R.id.webview);
         WebSettings s = webView.getSettings();
+        // Append a token so the PWA can detect it is running inside the APK
+        s.setUserAgentString(s.getUserAgentString() + " LunchAPK/1");
         s.setJavaScriptEnabled(true);
         s.setGeolocationEnabled(true);
         s.setDomStorageEnabled(true);
