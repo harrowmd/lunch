@@ -33,15 +33,8 @@
       font-weight: 600;
       color: #333;
     }
-    #weather-emoji {
-      font-size: 2rem;
-      line-height: 1;
-    }
-    #weather-tip {
-      font-size: 0.75rem;
-      color: #888;
-      text-align: right;
-    }
+    #weather-emoji { font-size: 2rem; line-height: 1; }
+    #weather-tip   { font-size: 0.75rem; color: #888; text-align: right; }
 
     /* ── Main content ── */
     #main {
@@ -51,12 +44,7 @@
       align-items: center;
       min-height: 100vh;
     }
-
-    #status-msg {
-      margin-top: 3rem;
-      font-size: 1rem;
-      color: #666;
-    }
+    #status-msg { margin-top: 3rem; font-size: 1rem; color: #666; }
 
     /* ── Meal card ── */
     #meal-card {
@@ -72,63 +60,127 @@
       transition: transform 0.25s ease, opacity 0.25s ease;
       touch-action: pan-y;
     }
-    #meal-img {
-      width: 100%;
-      aspect-ratio: 4/3;
-      object-fit: cover;
-    }
-    #meal-body {
-      padding: 1rem 1.25rem 1.25rem;
-      width: 100%;
-    }
+    #meal-img  { width: 100%; aspect-ratio: 4/3; object-fit: cover; }
+    #meal-body { padding: 1rem 1.25rem 1.25rem; width: 100%; }
     #meal-name {
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: #222;
-      margin-bottom: 0.6rem;
+      font-size: 1.2rem; font-weight: 600; color: #222; margin-bottom: 0.6rem;
     }
     #meal-link {
-      display: inline-block;
-      font-size: 0.85rem;
-      color: #1a73e8;
-      word-break: break-all;
-      text-decoration: none;
+      display: inline-block; font-size: 0.85rem; color: #1a73e8;
+      word-break: break-all; text-decoration: none;
     }
     #meal-link:hover { text-decoration: underline; }
     #yummy {
-      display: none;
-      margin-top: 0.8rem;
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: #e53935;
+      display: none; margin-top: 0.8rem;
+      font-size: 1.1rem; font-weight: 600; color: #e53935;
     }
 
-    /* ── Android download bar ── */
-    #apk-bar {
+    /* ── Help button ── */
+    #help-btn {
+      position: fixed;
+      bottom: 1.1rem;
+      left: 1.1rem;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(4px);
+      border: 1.5px solid #ccc;
+      color: #666;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      user-select: none;
+    }
+    #help-btn:active { background: #e8eaf6; }
+
+    /* ── Help overlay ── */
+    #help-overlay {
       display: none;
       position: fixed;
-      bottom: 0; left: 0; right: 0;
-      padding: 0.5rem 1.25rem;
-      background: rgba(255,255,255,0.92);
-      backdrop-filter: blur(6px);
-      border-top: 1px solid #e0e0e0;
-      z-index: 10;
-      text-align: center;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 30;
+      align-items: flex-end;
+      justify-content: center;
     }
-    #apk-btn {
+    #help-overlay.open { display: flex; }
+
+    #help-sheet {
+      background: #fff;
+      border-radius: 1.25rem 1.25rem 0 0;
+      width: 100%;
+      max-width: 520px;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 1.5rem 1.5rem 2rem;
+      animation: slideUp 0.25s ease;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to   { transform: translateY(0); }
+    }
+
+    #help-close {
+      float: right;
+      background: none;
+      border: none;
+      font-size: 1.4rem;
+      color: #aaa;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0 0.2rem;
+    }
+    #help-close:active { color: #555; }
+
+    .help-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #1a73e8;
+      margin-bottom: 1rem;
+    }
+    .help-section {
+      margin-bottom: 1.1rem;
+    }
+    .help-section h3 {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #999;
+      margin-bottom: 0.35rem;
+    }
+    .help-section p {
+      font-size: 0.95rem;
+      color: #444;
+      line-height: 1.55;
+    }
+    .help-row {
+      display: flex;
+      gap: 0.6rem;
+      align-items: baseline;
+      margin-bottom: 0.3rem;
+    }
+    .help-icon { font-size: 1rem; flex-shrink: 0; }
+    .help-row p { font-size: 0.92rem; color: #444; line-height: 1.45; }
+
+    #apk-link-wrap { margin-top: 1.4rem; text-align: center; }
+    #apk-link {
       display: inline-block;
-      width: 50%;
-      padding: 0.45rem 0.5rem;
+      padding: 0.6rem 1.4rem;
       background: #1a73e8;
       color: white;
-      font-size: 0.72rem;
+      font-size: 0.9rem;
       font-weight: 600;
-      text-align: center;
       text-decoration: none;
-      border-radius: 0.4rem;
-      letter-spacing: 0.01em;
+      border-radius: 0.5rem;
     }
-    #apk-btn:active { background: #1557b0; }
+    #apk-link:active { background: #1557b0; }
   </style>
 </head>
 <body>
@@ -141,14 +193,6 @@
     </div>
   </div>
 
-  <div id="apk-bar">
-    <a id="apk-btn"
-       href="https://github.com/harrowmd/lunch/releases/latest/download/lunch.apk"
-       download="lunch.apk">
-      ⬇ Download Android APP
-    </a>
-  </div>
-
   <div id="main">
     <div id="status-msg">Detecting location…</div>
 
@@ -158,6 +202,68 @@
         <div id="meal-name"></div>
         <a id="meal-link" href="#" target="_blank" rel="noopener"></a>
         <div id="yummy"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Help button -->
+  <button id="help-btn" aria-label="Help">?</button>
+
+  <!-- Help overlay -->
+  <div id="help-overlay" role="dialog" aria-modal="true" aria-label="Help">
+    <div id="help-sheet">
+      <button id="help-close" aria-label="Close">✕</button>
+
+      <div class="help-title">🥗 Lunch — What's for lunch?</div>
+
+      <div class="help-section">
+        <h3>About</h3>
+        <p>A lightweight progressive web app that suggests a random keto-friendly lunch idea based on where you are and what the weather is doing.</p>
+      </div>
+
+      <div class="help-section">
+        <h3>Features</h3>
+        <div class="help-row">
+          <span class="help-icon">📍</span>
+          <p>Detects your location and fetches live local weather</p>
+        </div>
+        <div class="help-row">
+          <span class="help-icon">🌤️</span>
+          <p>Displays a weather emoji in the top-right corner — clear, cloudy, rain, snow, hot or freezing</p>
+        </div>
+        <div class="help-row">
+          <span class="help-icon">🍗</span>
+          <p>Picks a random keto-friendly meal from a curated database (chicken, beef, seafood, lamb or pork)</p>
+        </div>
+        <div class="help-row">
+          <span class="help-icon">📸</span>
+          <p>Shows a photo, the dish name, and a link to the full recipe</p>
+        </div>
+      </div>
+
+      <div class="help-section">
+        <h3>Gestures</h3>
+        <div class="help-row">
+          <span class="help-icon">👈</span>
+          <p><strong>Swipe left</strong> on the card to dismiss it and load the next random suggestion</p>
+        </div>
+        <div class="help-row">
+          <span class="help-icon">👉</span>
+          <p><strong>Swipe right</strong> if it looks good — get a "Yummy!" reaction</p>
+        </div>
+      </div>
+
+      <div class="help-section">
+        <h3>How it works</h3>
+        <p>Weather data comes from <strong>Open-Meteo</strong> (free, no account needed). Meal data and photos come from <strong>TheMealDB</strong>. No data is stored or sent anywhere.</p>
+      </div>
+
+      <div id="apk-link-wrap" style="display:none;">
+        <a id="apk-link"
+           href="https://github.com/harrowmd/lunch/releases/latest/download/lunch.apk"
+           download="lunch.apk">
+          ⬇ Download Android App
+        </a>
       </div>
     </div>
   </div>
@@ -223,7 +329,6 @@
     }
 
     // ── Meal (TheMealDB) ─────────────────────────────────────
-    // Keto-friendly categories to pick from
     const KETO_CATEGORIES = ['Chicken','Beef','Seafood','Lamb','Pork'];
 
     async function fetchMeal() {
@@ -231,29 +336,27 @@
       const cat = KETO_CATEGORIES[Math.floor(Math.random() * KETO_CATEGORIES.length)];
       const listRes = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?c=${cat}`);
       if (!listRes.ok) throw new Error('Meal list error');
-      const listData = await listRes.json();
-      const meals = listData.meals;
+      const meals = (await listRes.json()).meals;
       const pick  = meals[Math.floor(Math.random() * meals.length)];
 
-      // Fetch full details for the source URL
       const detailRes = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${pick.idMeal}`);
       if (!detailRes.ok) throw new Error('Meal detail error');
       const detail = (await detailRes.json()).meals[0];
 
       const recipeUrl = detail.strSource || detail.strYoutube || `https://www.themealdb.com/meal/${detail.idMeal}`;
 
-      mealImg.src          = detail.strMealThumb;
-      mealImg.alt          = detail.strMeal;
-      mealName.textContent = detail.strMeal;
-      mealLink.href        = recipeUrl;
-      mealLink.textContent = recipeUrl;
+      mealImg.src             = detail.strMealThumb;
+      mealImg.alt             = detail.strMeal;
+      mealName.textContent    = detail.strMeal;
+      mealLink.href           = recipeUrl;
+      mealLink.textContent    = recipeUrl;
       yummyEl.style.display   = 'none';
       yummyEl.textContent     = '';
       mealCard.style.display  = 'flex';
       statusEl.style.display  = 'none';
     }
 
-    // ── Swipe-left to fetch next meal ────────────────────────
+    // ── Swipe gestures ───────────────────────────────────────
     let touchStartX = 0;
     let touchStartY = 0;
     let isSwiping   = false;
@@ -267,16 +370,12 @@
     mealCard.addEventListener('touchmove', e => {
       const dx = e.touches[0].clientX - touchStartX;
       const dy = e.touches[0].clientY - touchStartY;
-      // Only track as a horizontal swipe if it's more horizontal than vertical
       if (!isSwiping && Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10) {
         isSwiping = true;
       }
       if (isSwiping) {
-        // Follow finger horizontally, fade on left swipe only
         mealCard.style.transform = `translateX(${dx}px)`;
-        if (dx < 0) {
-          mealCard.style.opacity = String(Math.max(0, 1 + dx / 300));
-        }
+        if (dx < 0) mealCard.style.opacity = String(Math.max(0, 1 + dx / 300));
       }
     }, { passive: true });
 
@@ -284,7 +383,7 @@
       const dx = e.changedTouches[0].clientX - touchStartX;
 
       if (isSwiping && dx < -80) {
-        // ── Swipe LEFT → next meal ──────────────────────────
+        // Swipe LEFT → next meal
         mealCard.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
         mealCard.style.transform  = 'translateX(-110vw)';
         mealCard.style.opacity    = '0';
@@ -299,7 +398,7 @@
         }, 220);
 
       } else if (isSwiping && dx > 80) {
-        // ── Swipe RIGHT → show Yummy ────────────────────────
+        // Swipe RIGHT → Yummy
         mealCard.style.transition = 'transform 0.2s ease';
         mealCard.style.transform  = '';
         yummyEl.textContent       = `Yummy... ${randomSmiley()}`;
@@ -307,7 +406,7 @@
         setTimeout(() => { mealCard.style.transition = ''; }, 200);
 
       } else {
-        // ── Snap back ───────────────────────────────────────
+        // Snap back
         mealCard.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
         mealCard.style.transform  = '';
         mealCard.style.opacity    = '';
@@ -316,8 +415,26 @@
       isSwiping = false;
     }, { passive: true });
 
+    // ── Help overlay ─────────────────────────────────────────
+    const helpOverlay = document.getElementById('help-overlay');
+    document.getElementById('help-btn').addEventListener('click', () => {
+      helpOverlay.classList.add('open');
+    });
+    document.getElementById('help-close').addEventListener('click', () => {
+      helpOverlay.classList.remove('open');
+    });
+    helpOverlay.addEventListener('click', e => {
+      if (e.target === helpOverlay) helpOverlay.classList.remove('open');
+    });
+
     // ── Init ─────────────────────────────────────────────────
     async function init() {
+      // Show APK download link inside help sheet — Android browser only, not inside APK
+      const ua = navigator.userAgent;
+      if (/android/i.test(ua) && !/LunchAPK\//.test(ua)) {
+        document.getElementById('apk-link-wrap').style.display = 'block';
+      }
+
       if (!('geolocation' in navigator)) {
         weatherEmojiEl.textContent = '🌍';
         weatherTipEl.textContent   = 'No geolocation';
@@ -333,11 +450,8 @@
             weatherEmojiEl.textContent = '⚠️';
             weatherTipEl.textContent   = 'Weather unavailable';
           }
-          try {
-            await fetchMeal();
-          } catch (e) {
-            statusEl.textContent = 'Could not load meal: ' + e.message;
-          }
+          try { await fetchMeal(); }
+          catch (e) { statusEl.textContent = 'Could not load meal: ' + e.message; }
         },
         async () => {
           weatherEmojiEl.textContent = '📍';
@@ -348,27 +462,17 @@
       );
     }
 
-    // ── Fullscreen (hide browser address bar) ────────────────
+    // ── Fullscreen ───────────────────────────────────────────
     function requestFullscreen() {
       const el = document.documentElement;
       const fn = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen;
       if (fn) fn.call(el).catch(() => {});
     }
-    // Request on first user interaction (browsers require a gesture)
     document.addEventListener('touchstart', function onFirstTouch() {
       requestFullscreen();
       document.removeEventListener('touchstart', onFirstTouch);
     }, { once: true, passive: true });
-    // Also try on load for browsers that allow it without a gesture
     window.addEventListener('load', () => requestFullscreen());
-
-    // ── Android APK download bar ──────────────────────────────
-    // Show only on Android browsers — not when already running inside the APK
-    const ua = navigator.userAgent;
-    if (/android/i.test(ua) && !/LunchAPK\//.test(ua)) {
-      document.getElementById('apk-bar').style.display = 'block';
-      document.getElementById('main').style.paddingBottom = '5rem';
-    }
 
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js');

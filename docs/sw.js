@@ -1,4 +1,4 @@
-const CACHE = 'weather-pwa-v7';
+const CACHE = 'weather-pwa-v8';
 const ASSETS = ['/', '/index.html', '/manifest.json'];
 
 self.addEventListener('install', e => {
